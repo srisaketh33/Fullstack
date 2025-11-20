@@ -1,0 +1,11 @@
+Fastapi
+uvicorn
+pydantic
+jose[cryptography]
+python-dotenv
+motor
+passlib
+python-decouple
+pymongo
+
+
