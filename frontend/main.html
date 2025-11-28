@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SCMXpertLite</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS STYLES -->
+    <style>
+        /* --- General Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .hero-section {
+            height: 100vh; /* Full viewport height */
+            width: 100%;
+            
+            /* Fallback color in case image doesn't load */
+            background-color: #333;
+            /* IMPORTANT: Ensure 'pics/back.jpg' exists in your folder */
+            background-image: url('pics/back.png'); 
+            background-size: cover;
+            background-position: center;
+            
+            /* Flexbox to center the content */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* A position context for the overlay */
+            position: relative;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Dark overlay to make text readable */
+            background-color: rgba(0, 0, 0, 0.5); 
+        }
+
+        .hero-content {
+            /* Position content above the overlay */
+            position: relative; 
+            z-index: 2;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .welcome-text {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 4rem; /* Large, impactful text */
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 40px;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 2px solid #ffffff;
+            background: transparent;
+            color: #ffffff;
+            padding: 15px 35px;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* --- Media query for smaller screens --- */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 2.5rem;
+            }
+            .btn {
+                padding: 12px 25px;
+                display: block;
+                margin: 10px auto;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="welcome-text">WELCOME TO SCMXPERTLITE</p>
+            <h2>Powering Smarter, Faster, and More Reliable Supply Chains.</h2>
+            
+            <div class="button-container">
+                <!-- Button to Log In Page -->
+                <a href="trail.html" class="btn">Log In</a>
+                
+                <!-- Button to Sign Up Page (passing a parameter to open signup tab) -->
+                <a href="trail.html?form=signup-form" class="btn">Sign Up</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        /* 
+           NOTE: The JavaScript you provided (for signUpButton/signInButton) 
+           belongs to the 'trail.html' page where the actual forms exist.
+           
+           This page is just the landing page with links. 
+           I have commented out the code below to prevent console errors on this page.
+        */
+
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const signUpButton = document.getElementById('signUp');
+        //     const signInButton = document.getElementById('signIn');
+        //     const container = document.getElementById('container');
+        //
+        //     if(signUpButton && signInButton && container) {
+        //         signUpButton.addEventListener('click', () => {
+        //             container.classList.add("right-panel-active");
+        //         });
+        //
+        //         signInButton.addEventListener('click', () => {
+        //             container.classList.remove("right-panel-active");
+        //         });
+        //     }
+        // });
+    </script>
+</body>
+</html>

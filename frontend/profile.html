@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Account - SCMXpertLite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #333; color: white; padding-top: 100px; display: flex; justify-content: center; }
+        .glass-panel { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; width: 500px; }
+        
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 100; }
+        .navbar-brand { font-weight: bold; font-size: 1.2rem; }
+        .nav-links { list-style: none; display: flex; gap: 20px; }
+        .nav-links a { color: #ccc; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: white; }
+
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 12px; background: #5654ff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        button:hover { background: #4543e0; }
+        .section { margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; }
+        h3 { border-left: 4px solid #5654ff; padding-left: 10px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">SCMXpertLite</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="shipment.html">New Shipment</a></li>
+            <li><a href="#" id="logout-btn">Log Out</a></li>
+        </ul>
+    </nav>
+
+    <div class="glass-panel">
+        <h2 style="text-align: center;">My Profile</h2>
+
+        <!-- Update Details -->
+        <div class="section">
+            <h3>Update Details</h3>
+            <label>Username</label>
+            <input type="text" id="username_input" placeholder="Username">
+            <label>Email</label>
+            <input type="email" id="email_input" placeholder="Email">
+            <button onclick="updateDetails()">Save Changes</button>
+        </div>
+
+        <!-- Change Password -->
+        <div class="section" style="border: none;">
+            <h3>Change Password</h3>
+            <input type="password" id="old-pass" placeholder="Current Password">
+            <input type="password" id="new-pass" placeholder="New Password">
+            <button onclick="changePassword()" style="background-color: #ff5454;">Update Password</button>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://127.0.0.1:8000';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load current data
+            try {
+                const res = await fetch(`${API}/auth/me`);
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('username_input').value = data.username;
+                    document.getElementById('email_input').value = data.email;
+                } else {
+                    alert("Session expired.");
+                    window.location.href = 'trail.html';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await fetch(`${API}/auth/logout`, { method: 'POST' });
+                window.location.href = 'trail.html';
+            });
+        });
+
+        async function updateDetails() {
+            const username = document.getElementById('username_input').value;
+            const email = document.getElementById('email_input').value;
+
+            const payload = {};
+            if(username) payload.username = username;
+            if(email) payload.email = email;
+
+            try {
+                const res = await fetch(`${API}/user/profile/update`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+
+                if(res.ok) {
+                    // Check if the backend told us to logout (because email changed)
+                    if(data.action === "logout") {
+                        alert(data.message);
+                        window.location.href = 'trail.html';
+                    } else {
+                        alert("Details updated successfully!");
+                    }
+                } else {
+                    alert(`Update failed: ${data.detail}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Server error.");
+            }
+        }
+
+        async function changePassword() {
+            const oldPass = document.getElementById('old-pass').value;
+            const newPass = document.getElementById('new-pass').value;
+
+            if(!oldPass || !newPass) {
+                alert("Please enter both old and new passwords.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/user/profile/change-password`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({old_password: oldPass, new_password: newPass})
+                });
+
+                if(res.ok) {
+                    alert("Password changed! You can use the new password next time you login.");
+                    document.getElementById('old-pass').value = '';
+                    document.getElementById('new-pass').value = '';
+                } else {
+                    const d = await res.json();
+                    alert(`Error: ${d.detail}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Server error.");
+            }
+        }
+    </script>
+</body>
+</html>
