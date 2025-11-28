@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCMXpertLite - Create Shipment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Styles from previous steps */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { min-height: 100vh; background-image: url('pics/ship.png'); background-color: #333; background-size: cover; background-position: center; background-attachment: fixed; color: #fff; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 0 50px; height: 80px; width: 100%; position: fixed; top: 0; left: 0; z-index: 1000; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo { font-size: 26px; font-weight: 700; color: #ffffff; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 30px; height: 100%; }
+        .nav-links li a { text-decoration: none; color: #e0e0e0; font-size: 15px; font-weight: 400; display: flex; align-items: center; gap: 8px; transition: color 0.3s ease; }
+        .nav-links li a:hover, .nav-links li a.active { color: #fff; border-bottom: 2px solid white;}
+        .main-container { display: flex; justify-content: center; align-items: center; padding-top: 120px; padding-bottom: 50px; min-height: 100vh; }
+        .glass-form { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); width: 100%; max-width: 900px; padding: 40px 50px; border-radius: 16px; }
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 14px; margin-bottom: 8px; color: #f1f1f1; }
+        .input-group input, .input-group select, .input-group textarea { padding: 12px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.85); width: 100%; }
+        .form-actions { display: flex; justify-content: center; gap: 30px; margin-top: 40px; }
+        button { padding: 14px 40px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; color: white; }
+        .btn-create { background-color: #5654ff; }
+        .btn-clear { background-color: #eb3b3b; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .navbar { height: auto; flex-direction: column; padding: 15px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">SCMXpertLite</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-user"></i> My Account</a></li>
+            <li><a href="my_shipments.html"><i class="fa-solid fa-box-open"></i> My Shipment</a></li>
+            <li><a href="shipment.html" class="active"><i class="fa-solid fa-circle-plus"></i> New Shipment</a></li>
+            <li><a href="device_data.html"><i class="fa-solid fa-chart-line"></i> Device Data</a></li>
+            <li><a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <div class="glass-form">
+            <div class="form-header">
+                <h2>Create New Shipment</h2>
+                <p>Please fill all the details below.</p>
+            </div>
+
+            <form id="shipment-form">
+                <div class="form-grid">
+                    <div class="input-group"><label>Shipment Number*</label><input type="text" id="shipment_number" required></div>
+                    <div class="input-group"><label>Container Number*</label><input type="text" id="container_number" required></div>
+                    <div class="input-group">
+                        <label>Route Details*</label>
+                        <select id="route_details" required>
+                            <option value="" disabled selected>Select Route</option>
+                            <option value="New York - London">New York - London</option>
+                            <option value="Mumbai - Dubai">Mumbai - Dubai</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Goods Type*</label>
+                        <select id="goods_type" required>
+                            <option value="" disabled selected>Select Goods</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Perishable">Perishable</option>
+                            <option value="Medicine">Medicine</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Device*</label>
+                        <select id="device" required>
+                            <option value="" disabled selected>Select Device</option>
+                            <option value="GPS-101">GPS-101</option>
+                            <option value="SENSOR-X">SENSOR-X</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Expected Delivery Date*</label><input type="date" id="expected_delivery_date" required></div>
+                    <div class="input-group"><label>PO Number*</label><input type="text" id="po_number" required></div>
+                    <div class="input-group"><label>Delivery Number*</label><input type="text" id="delivery_number" required></div>
+                    <div class="input-group"><label>NDC Number*</label><input type="text" id="ndc_number" required></div>
+                    <div class="input-group"><label>Batch Id*</label><input type="text" id="batch_id" required></div>
+                    <div class="input-group"><label>Serial number of Goods*</label><input type="text" id="serial_number_of_goods" required></div>
+                    <div class="input-group"><label>Shipment Description*</label><textarea id="shipment_description" required></textarea></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-create">CREATE SHIPMENT</button>
+                    <button type="button" class="btn-clear" id="clear-btn">CLEAR DETAILS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("shipment-form");
+            const logoutBtn = document.getElementById("logout-btn");
+            const clearBtn = document.getElementById("clear-btn");
+
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    await fetch(`${API_URL}/auth/logout`, { method: 'POST' });
+                    window.location.href = 'trail.html';
+                });
+            }
+
+            if(clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    form.reset();
+                });
+            }
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault(); 
+                
+                const shipmentData = {
+                    shipment_number: document.getElementById("shipment_number").value,
+                    container_number: document.getElementById("container_number").value,
+                    route_details: document.getElementById("route_details").value,
+                    goods_type: document.getElementById("goods_type").value,
+                    device: document.getElementById("device").value,
+                    expected_delivery_date: document.getElementById("expected_delivery_date").value,
+                    po_number: document.getElementById("po_number").value,
+                    delivery_number: document.getElementById("delivery_number").value,
+                    ndc_number: document.getElementById("ndc_number").value,
+                    batch_id: document.getElementById("batch_id").value,
+                    serial_number_of_goods: document.getElementById("serial_number_of_goods").value,
+                    shipment_description: document.getElementById("shipment_description").value
+                };
+
+                try {
+                    // --- IMPORTANT: Ensure this URL matches your backend exactly ---
+                    const response = await fetch(`${API_URL}/shipment/create-shipment`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(shipmentData)
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        alert("SUCCESS: Shipment created!");
+                        form.reset();
+                        window.location.href = "my_shipments.html"; // Redirect to see data
+                    } else {
+                        alert(`BACKEND ERROR: ${data.detail || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("CONNECTION ERROR: Is the backend running?");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

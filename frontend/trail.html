@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCM Authentication</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            /* IMPORTANT: Make sure this image exists in your 'pics' folder */
+            background-image: url('pics/back.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 20px;
+            letter-spacing: 0.5px;
+            margin: 20px 0 30px;
+            color: #cdd6f6;
+        }
+
+        a {
+            color: #64ffda;
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        button {
+            border-radius: 20px;
+            border: 1px solid #64ffda;
+            background-color: #64ffda;
+            color: #0a192f;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 80ms ease-in;
+            cursor: pointer;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:focus { outline: none; }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        form {
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        input {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            color: #ffffff;
+        }
+        input::placeholder { color: #8892b0; }
+        input:focus { outline: none; border-color: #64ffda; }
+
+        .container {
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+            position: relative;
+            overflow: hidden;
+            width: 768px;
+            max-width: 100%;
+            min-height: 480px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+            background-color: rgba(10, 25, 47, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .overlay {
+            background: #112240;
+            color: #FFFFFF;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left { transform: translateX(-20%); }
+        .overlay-right { right: 0; transform: translateX(0); }
+
+        .container.right-panel-active .sign-in-container { transform: translateX(100%); }
+        .container.right-panel-active .overlay-container { transform: translateX(-100%); }
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+        .container.right-panel-active .overlay { transform: translateX(50%); }
+        .container.right-panel-active .overlay-left { transform: translateX(0); }
+        .container.right-panel-active .overlay-right { transform: translateX(20%); }
+
+        @keyframes show {
+            0%, 49.99% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+        }
+
+        #message {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 768px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <!-- Sign Up Form Container -->
+        <div class="form-container sign-up-container">
+            <form id="signup-form">
+                <h1>Create Account</h1>
+                <input type="text" id="signup-username" placeholder="Username" required />
+                <input type="email" id="signup-email" placeholder="Email" required />
+                <input type="password" id="signup-password" placeholder="Password" required />
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Sign In Form Container -->
+        <div class="form-container sign-in-container">
+            <form id="login-form">
+                <h1>Login In</h1>
+                <input type="email" id="login-email" placeholder="Email" required />
+                <input type="password" id="login-password" placeholder="Password" required />
+                <a href="#">Forgot your password?</a>
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+
+        <!-- The Solid Sliding Overlay -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Log In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start your journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message"></div>
+
+    <!-- FINAL JAVASCRIPT -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+
+            // --- Animation Handlers ---
+            signUpButton.addEventListener('click', () => {
+                container.classList.add("right-panel-active");
+            });
+
+            signInButton.addEventListener('click', () => {
+                container.classList.remove("right-panel-active");
+            });
+
+            // --- URL Parameter Check (auto-open signup panel) ---
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('form') === 'signup-form') {
+                container.classList.add("right-panel-active");
+            }
+
+            // --- SIGN UP HANDLER ---
+            const signupForm = document.getElementById('signup-form');
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('signup-username').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+
+                try {
+                    // Corrected URL: /user/signup
+                    const response = await fetch(`${API_URL}/user/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert("Account created successfully! Please Log In.");
+                        container.classList.remove("right-panel-active");
+                        signupForm.reset();
+                    } else {
+                        alert(`Registration Failed: ${data.detail || 'Unknown Error'}`);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Failed to connect to server.");
+                }
+            });
+
+            // --- LOGIN HANDLER ---
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    // Corrected URL: /user/login
+                    const response = await fetch(`${API_URL}/user/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('role', data.role);
+                        window.location.href = "dashboard.html"; 
+                    } else {
+                        alert(`Login Failed: ${data.detail || 'Invalid credentials'}`);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Failed to connect to server.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
