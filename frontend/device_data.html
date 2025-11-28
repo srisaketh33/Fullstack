@@ -1,0 +1,488 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCMXpertLite - Device Data Stream</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS STYLES -->
+    <style>
+        /* --- General Reset --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            /* Dark Network Background */
+            background-image: url('pics/device.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: #fff;
+        }
+
+        /* --- Fixed Navbar --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 50px;
+            height: 80px;
+            width: 100%;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .nav-links li {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #e0e0e0;
+            font-size: 15px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background-color: #fff;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: #fff;
+        }
+
+        .nav-links li a:hover::after,
+        .nav-links li a.active::after {
+            width: 100%;
+        }
+
+        /* --- Main Content Layout --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding-top: 100px; /* Space for navbar */
+            padding-bottom: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+            min-height: 100vh;
+        }
+
+        /* --- Glass Container --- */
+        .glass-container {
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+            
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            /* Ensure minimum height so it looks good even when empty */
+            min-height: 400px; 
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Filter Section --- */
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .filter-label {
+            font-size: 16px;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-wrapper label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-weight: 700;
+        }
+
+        .device-select {
+            width: 300px;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: none;
+            background-color: #f0f0f0;
+            color: #333;
+            font-size: 15px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-get-data {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            background-color: #5654ff;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(86, 84, 255, 0.4);
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            height: 44px;
+        }
+
+        .btn-get-data:hover {
+            background-color: #4543e0;
+            transform: translateY(-2px);
+        }
+
+        /* --- Data Table Styling --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-height: 100px; /* Space for empty state */
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Table Header */
+        .data-table thead {
+            background-color: #3b3bf5;
+        }
+
+        .data-table th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Table Body (Styles will apply when JS adds rows) */
+        .data-table tbody tr {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .data-table td {
+            padding: 14px 20px;
+            vertical-align: middle;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 768px) {
+            .navbar {
+                height: auto;
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                background: rgba(0,0,0,0.9);
+                position: relative;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+
+            .device-select {
+                width: 100%;
+            }
+
+            .btn-get-data {
+                width: 100%;
+            }
+            
+            .main-container {
+                padding-top: 30px;
+            }
+            
+            .glass-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Navbar -->
+    <nav class="navbar">
+        <div class="logo">SCMXpertLite</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fa-solid fa-user"></i> My Account</a></li>
+            <li><a href="#"><i class="fa-solid fa-box-open"></i> My Shipment</a></li>
+            <li><a href="shipment.html"><i class="fa-solid fa-circle-plus"></i> New Shipment</a></li>
+            <li><a href="device_data.html" class="active"><i class="fa-solid fa-chart-line"></i> Device Data</a></li>
+            <!-- ID for Logout -->
+            <li><a href="main.html" id="logout-link"><i class="fa-solid fa-right-from-bracket"></i> Log out</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="glass-container">
+            
+            <h1 class="page-title">Device Data Stream</h1>
+
+            <!-- Filter Controls -->
+            <div class="filter-section">
+                <p class="filter-label">Please Select a Device Id to See the Data Stream</p>
+                <div class="filter-controls">
+                    <div class="input-wrapper">
+                        <label>Device Id<span class="required">*</span></label>
+                        <!-- Dropdown ID -->
+                        <select class="device-select" id="device-select">
+                            <option value="">Loading devices...</option>
+                        </select>
+                    </div>
+                    <!-- Button ID -->
+                    <button class="btn-get-data" id="btn-get-data">GET DEVICE DATA</button>
+                </div>
+            </div>
+
+            <!-- No Data Message (Hidden by default) -->
+            <div id="no-data-message" style="display:none; text-align:center; color:white; margin-top:10px;">
+                No data found for this device.
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Device Id</th>
+                            <th>Battery Level</th>
+                            <th>Temp</th>
+                            <th>Route From</th>
+                            <th>Route To</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <!-- Body ID -->
+                    <tbody id="device-data-body">
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. AUTHENTICATION CHECK ---
+            const user = localStorage.getItem('username');
+            if (!user) {
+                // You can uncomment the alert if you want a popup check
+                // alert("Please login first.");
+                
+                // If checking logic is strict, you would redirect here:
+                // window.location.href = 'main.html';
+                // return;
+            }
+
+            // --- 2. GET ELEMENTS ---
+            const deviceSelect = document.getElementById('device-select');
+            const getDataBtn = document.getElementById('btn-get-data');
+            const tableBody = document.getElementById('device-data-body');
+            const noDataMessage = document.getElementById('no-data-message');
+            const logoutLink = document.getElementById('logout-link');
+
+            let currentDeviceId = null;
+            let refreshInterval = null;
+
+            // --- 3. FETCH DEVICE LIST (For Dropdown) ---
+            async function fetchDeviceIds() {
+                try {
+                    // Note: /stream comes from app.include_router(..., prefix="/stream") in main.py
+                    const response = await fetch(`${API_BASE_URL}/stream/devices`);
+                    
+                    if (!response.ok) throw new Error('Failed to fetch devices');
+                    
+                    const deviceIds = await response.json();
+
+                    deviceSelect.innerHTML = '<option value="">-- Select a Device --</option>';
+                    deviceIds.forEach(id => {
+                        const option = document.createElement('option');
+                        option.value = id;
+                        option.textContent = id;
+                        deviceSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    // For UI purposes, if the API fails, we show an error option
+                    deviceSelect.innerHTML = '<option value="">Error loading devices</option>';
+                }
+            }
+
+            // --- 4. FETCH TABLE DATA ---
+            async function fetchAndDisplayData() {
+                if (!currentDeviceId) return;
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/stream/devices/${currentDeviceId}`);
+                    
+                    if (response.status === 404) {
+                        tableBody.innerHTML = '';
+                        noDataMessage.style.display = 'block';
+                        return;
+                    }
+
+                    const data = await response.json();
+                    
+                    // Clear table and hide error message
+                    tableBody.innerHTML = '';
+                    noDataMessage.style.display = 'none';
+
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        
+                        // Format Date
+                        const dateObj = new Date(record.Timestamp);
+                        const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
+
+                        row.innerHTML = `
+                            <td>${record['Device Id']}</td>
+                            <td>${record['Battery Level']}</td>
+                            <td>${record['First Sensor temperature']}</td>
+                            <td>${record['Route From']}</td>
+                            <td>${record['Route To']}</td>
+                            <td>${dateStr}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                } catch (error) {
+                    console.error("Error fetching stream:", error);
+                }
+            }
+
+            // --- 5. HANDLE "GET DATA" CLICK ---
+            if(getDataBtn) {
+                getDataBtn.addEventListener('click', () => {
+                    currentDeviceId = deviceSelect.value;
+                    
+                    if (!currentDeviceId) {
+                        alert("Please select a Device ID first.");
+                        return;
+                    }
+
+                    // Clear previous interval to avoid duplicates
+                    if (refreshInterval) clearInterval(refreshInterval);
+
+                    // Fetch immediately
+                    fetchAndDisplayData();
+
+                    // Start Auto-Refresh (Every 5 seconds)
+                    refreshInterval = setInterval(fetchAndDisplayData, 5000);
+                });
+            }
+
+            // --- 6. LOGOUT LOGIC ---
+            if(logoutLink){
+                logoutLink.addEventListener('click', () => {
+                    localStorage.removeItem('username');
+                });
+            }
+
+            // Load dropdown on startup
+            fetchDeviceIds();
+        });
+    </script>
+</body>
+</html>
