@@ -1,68 +1,54 @@
-# main.py
-from fastapi import FastAPI
-from database import db
-from auth import get_password_hash
-from datetime import datetime
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-app = FastAPI()
-# --- ADD THIS CODE BLOCK ---
-origins = [
-    "http://localhost:3000", # If using React default
-    "http://localhost:5173", # If using Vite
-    "http://localhost:8080", 
-    "*"                      # Allow all (use only for development)
-]
+from fastapi.staticfiles import StaticFiles
+import os
+from pathlib import Path
+from fastapi.responses import RedirectResponse
 
+# Import Routers
+# These imports assume you are running the command from the PROJECT ROOT folder
+from backend.user import router as user_router
+from backend.auth import router as auth_router
+from backend.device import router as device_router
+from backend.shipment import router as shipment_router
+
+# --- DEFINING APP INSTANCE ---
+app = FastAPI(title="SCMXpertLite")
+
+# CORS Middleware (Allows frontend to talk to backend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],   
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# ---------------------------
 
-@app.post("/register") # Example endpoint
-def register_user(user_data: dict):
-    return {"msg": "Success"}
+# --- MOUNT FRONTEND STATIC FILES ---
+# This logic ensures we find the 'frontend' folder regardless of where the script runs
+BASE_DIR = Path(__file__).resolve().parent.parent
+frontend_dir = BASE_DIR / "frontend"
 
-# Import Routers
-from Routes.user_routes import router as user_router
-from Routes.shipments_routes import router as shipments_router
-from Routes.admin_routes import router as admin_router
-from Routes.device_routes import router as device_router 
+if not os.path.isdir(frontend_dir):
+    # Fallback if specific path logic fails
+    frontend_dir = os.path.join(os.getcwd(), "frontend")
 
-app = FastAPI(title="SCM_Architecture")
+if os.path.isdir(frontend_dir):
+    app.mount("/frontend", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+else:
+    print(f"WARNING: Frontend directory not found at {frontend_dir}")
 
-@app.on_event("startup")
-async def startup_db_and_admin():
-    # 1. Create Indexes for speed and uniqueness
-    await db.users.create_index("email", unique=True)
-    await db.users.create_index("username", unique=True)
-    await db.sessions.create_index("refresh_token_hash")
-    await db.shipments.create_index("created_by")
-    await db.devices_data.create_index("device_id")
-    
-    # 2. Create Default Admin if not exists
-    admin_email = "admin@example.com"
-    if not await db.users.find_one({"email": admin_email}):
-        await db.users.insert_one({
-            "email": admin_email,
-            "username": "superadmin",
-            "full_name": "Super Admin",
-            "password_hash": get_password_hash("AdminPass123!"), # Meets validation requirements
-            "is_admin": True,
-            "created_at": datetime.utcnow()
-        })
-        print(f"Admin created: {admin_email}")
+# --- INCLUDE ROUTERS ---
+app.include_router(user_router, prefix="/user", tags=["User"])
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(device_router, prefix="/stream", tags=["Device"]) # Note: Prefix is /stream based on your frontend JS
+app.include_router(shipment_router, prefix="/shipment", tags=["Shipment"])
 
-# Include Routers
-app.include_router(user_router)
-app.include_router(shipments_router)
-app.include_router(device_router)
-app.include_router(admin_router)
-
+# --- ROOT REDIRECT ---
 @app.get("/")
 def root():
-    return {"message": "System Online. Visit /docs for Swagger UI"}
+    return RedirectResponse(url="/frontend/trail.html")
+
+if __name__ == "__main__":
+    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)

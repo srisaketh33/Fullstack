@@ -1,9 +1,15 @@
-import motor.motor_asyncio
-from config import MONGO_URI, MONGO_DB
+# backend/database.py
+import os
+from pymongo import MongoClient
+from dotenv import load_dotenv
 
-print("Loading database.py...") # <--- Add this
+load_dotenv()
 
-# Initialize MongoDB client
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-db = client[MONGO_DB]
-print("db object created in database.py.") # <--- Add this
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client[os.getenv("DB_NAME", "db")] # Default to 'db' if not set
+
+users_collection = db["users"]
+# New collection for token revocation
+blacklist_collection = db["token_blacklist"] 
+shipments_collection = db["shipments"]
+device_collection = db["device_streams"]
