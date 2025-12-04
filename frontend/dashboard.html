@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SCMXpertLite</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* DASHBOARD CSS */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            background-color: #1a1a2e; 
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('pics/dash.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .main-header { 
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 0 40px; 
+            border-bottom: 1px solid var(--glass-border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 80px; 
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-brand h3 { 
+            margin: 0; 
+            color: #ffffff; 
+            font-size: 1.8em; 
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .top-nav ul { 
+            list-style: none; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+        }
+
+        .top-nav li a { 
+            position: relative; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d1d1d1; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            font-weight: 500; 
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .top-nav li a:hover, .top-nav li.active a { 
+            color: #ffffff; 
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px rgba(118, 75, 162, 0.3);
+        }
+
+        .top-nav li a i {
+            font-size: 1.1em;
+        }
+
+        .main-content { 
+            padding: 60px 20px; 
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .welcome-banner { 
+            margin-bottom: 60px; 
+        }
+
+        .welcome-banner h2 { 
+            font-size: 3.5em; 
+            color: #ffffff; 
+            font-weight: 300; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .welcome-banner span {
+            font-weight: 800;
+            color: #764ba2;
+            text-shadow: 0 0 5px rgba(118, 75, 162, 0.5);
+        }
+
+        .cta-container { 
+            display: flex; 
+            gap: 40px; 
+            margin-top: 30px; 
+            justify-content: center; 
+            flex-wrap: wrap;
+        }
+
+        .cta-panel { 
+            flex: 1; 
+            min-width: 300px;
+            max-width: 450px; 
+            text-align: center; 
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .cta-panel:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .cta-panel h3 { 
+            font-size: 1.6em; 
+            color: #ffffff; 
+            margin-bottom: 25px; 
+            font-weight: 600;
+        }
+
+        .cta-panel button { 
+            padding: 16px 40px; 
+            border: none; 
+            background: var(--primary-gradient); 
+            color: #ffffff; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-size: 1em; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .cta-panel button:hover { 
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(118, 75, 162, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main-header {
+                flex-direction: column;
+                height: auto;
+                padding: 20px;
+            }
+            .top-nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            .welcome-banner h2 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <header class="main-header">
+            <div class="header-brand"><h3>SCMXpertLite</h3></div>
+            
+            <!-- FIXED NAVBAR -->
+            <nav class="top-nav">
+                <ul>
+                    <li class="active"><a href="dashboard.html"><span><i class="fas fa-tachometer-alt"></i> Dashboard</span></a></li>
+                    <li><a href="profile.html"><span><i class="fas fa-user"></i> My Account</span></a></li>
+                    <li><a href="my_shipments.html"><span><i class="fas fa-box"></i> My Shipment</span></a></li>
+                    <li><a href="shipment.html"><span><i class="fas fa-plus-circle"></i> New Shipment</span></a></li>
+                    <li><a href="device_data.html"><span><i class="fas fa-chart-line"></i> Device Data</span></a></li>
+                    <li><a href="#" id="logout-button"><span><i class="fas fa-sign-out-alt"></i> Log out</span></a></li>
+                    <li id="admin-link" style="display:none;"><a href="admin.html"><span><i class="fas fa-users-cog"></i> Admin</span></a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="welcome-banner">
+            <h2>Hi <span id="username">User</span>,<br>Welcome to SCMXpertLite</h2>
+        </div>
+
+        <div class="cta-container">
+            <div class="cta-panel">
+                <h3>Create a New Shipment</h3>
+                <button onclick="window.location.href='shipment.html'">CREATE SHIPMENT</button>
+            </div>
+            <div class="cta-panel">
+                <h3>View Device Data Stream</h3>
+                <button onclick="window.location.href='device_data.html'">DEVICE DATA STREAM</button>
+            </div>
+        </div>
+
+        <div id="admin-table" style="display:none; margin-top:40px;">
+            <h3 style="text-align:left; margin:10px 0 20px 0;">User Management</h3>
+            <div style="overflow-x:auto; background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:12px;">
+                <table style="width:100%; border-collapse:collapse; color:#fff;">
+                    <thead style="background: rgba(255,255,255,0.1);">
+                        <tr>
+                            <th style="padding:12px 16px; text-align:left;">ID</th>
+                            <th style="padding:12px 16px; text-align:left;">Username</th>
+                            <th style="padding:12px 16px; text-align:left;">Email</th>
+                            <th style="padding:12px 16px; text-align:left;">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check session
+            try {
+                // Include cookies when checking session
+                const response = await fetch('/auth/me', { credentials: 'include' });
+                if (response.ok) {
+                    const userData = await response.json();
+                    document.getElementById('username').textContent = userData.username;
+                    if (userData.role === 'admin') {
+                        document.getElementById('admin-link').style.display = 'block';
+                        const adminTable = document.getElementById('admin-table');
+                        adminTable.style.display = 'block';
+                        const res = await fetch('/user/all', { credentials: 'include' });
+                        if (res.ok) {
+                            const users = await res.json();
+                            const body = document.getElementById('users-body');
+                            body.innerHTML = '';
+                            users.forEach(u => {
+                                const tr = document.createElement('tr');
+                                tr.style.borderBottom = '1px solid rgba(255,255,255,0.08)';
+                                tr.innerHTML = `
+                                    <td style="padding:12px 16px;">${u.id}</td>
+                                    <td style="padding:12px 16px;">${u.username}</td>
+                                    <td style="padding:12px 16px;">${u.email}</td>
+                                    <td style="padding:12px 16px;">${u.role}</td>
+                                `;
+                                body.appendChild(tr);
+                            });
+                        }
+                    }
+                } else {
+                    window.location.href = 'trail.html';
+                }
+            } catch (e) {
+                window.location.href = 'trail.html';
+            }
+
+            // Logout
+            document.getElementById('logout-button').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+                localStorage.clear();
+                window.location.href = 'trail.html';
+            });
+        });
+    </script>
+</body>
+</html>

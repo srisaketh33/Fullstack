@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Shipments</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- General Reset --- */
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: #1a1a2e; 
+            color: white; 
+            margin: 0; 
+            padding-top: 80px; 
+            min-height: 100vh;
+            
+            /* FIXED: Correct syntax for background image with gradient overlay */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('pics/ship.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        /* --- Navbar (Matches Dashboard) --- */
+        .navbar { 
+            position: fixed; top: 0; width: 100%; height: 80px; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 40px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            z-index: 1000; 
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links li a { 
+            color: #ccc; text-decoration: none; font-weight: 500; font-size: 0.9rem; 
+            display: flex; align-items: center; gap: 8px; transition: 0.3s; 
+        }
+        .nav-links li a:hover, .nav-links li a.active { 
+            color: #8f94fb; 
+            text-shadow: 0 0 8px rgba(143, 148, 251, 0.4); 
+        }
+        
+        /* --- Main Content --- */
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+        
+        h1 { 
+            text-align: center; margin-bottom: 40px; font-weight: 700; 
+            font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        /* --- Grid & Cards --- */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        
+        .card { 
+            background: rgba(30, 30, 40, 0.6); 
+            padding: 25px; 
+            border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Neon border accent on left */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, #4e54c8, #8f94fb);
+        }
+
+        .card:hover { 
+            transform: translateY(-8px); 
+            background: rgba(40, 40, 50, 0.8); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            border-color: rgba(143, 148, 251, 0.3);
+        }
+
+        .card h3 { 
+            color: #fff; margin-top: 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            padding-bottom: 15px; 
+            font-size: 1.2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .card h3 i { color: #8f94fb; }
+
+        .card p { margin: 12px 0; font-size: 0.9em; color: #d1d1d1; display: flex; justify-content: space-between; }
+        .label { font-weight: 600; color: #8f94fb; text-transform: uppercase; font-size: 0.8rem; }
+
+        .desc-box {
+            margin-top:15px; padding-top:15px; 
+            border-top:1px dashed rgba(255,255,255,0.1); 
+            font-size:0.85rem; color:#aaa; font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SCMXpertLite</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-user"></i> My Account</a></li>
+            <li><a href="my_shipments.html" class="active"><i class="fa-solid fa-box-open"></i> My Shipment</a></li>
+            <li><a href="shipment.html"><i class="fa-solid fa-circle-plus"></i> New Shipment</a></li>
+            <li><a href="device_data.html"><i class="fa-solid fa-chart-line"></i> Device Data</a></li>
+            <li><a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>All Shipments</h1>
+        <div class="card-grid" id="shipment-grid">
+            <p style="text-align:center; grid-column: 1/-1; color: #aaa;">Loading shipments...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadShipments();
+
+            const logoutBtn = document.getElementById("logout-btn");
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+                    window.location.href = 'trail.html';
+                });
+            }
+        });
+
+        async function loadShipments() {
+            try {
+                const res = await fetch(`${API_URL}/shipment/shipments`,{
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    // IMPORTANT: Send the cookie/session
+                    credentials: 'include' 
+                });
+                if(res.status === 401) {
+                    alert("Please login to view shipments.");
+                    window.location.href = "trail.html";
+                    return;
+                }
+
+                
+                if (!res.ok) throw new Error("Failed to fetch data");
+                
+                const data = await res.json();
+                const grid = document.getElementById('shipment-grid');
+                grid.innerHTML = '';
+
+                const shipments = data.shipments || [];
+
+                if(shipments.length > 0) {
+                    shipments.forEach(ship => {
+                        // Skip empty/dummy data if necessary
+                        if (ship.shipment_number === "string") return;
+
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        // Format date nicely
+                        let dateDisplay = ship.expected_delivery_date;
+                        if(dateDisplay && dateDisplay.includes('T')) {
+                            dateDisplay = dateDisplay.split('T')[0];
+                        }
+
+                        card.innerHTML = `
+                            <h3>${ship.shipment_number} <i class="fa-solid fa-truck-fast"></i></h3>
+                            <p><span class="label">Container</span> <span>${ship.container_number}</span></p>
+                            <p><span class="label">Goods</span> <span>${ship.goods_type}</span></p>
+                            <p><span class="label">Device</span> <span>${ship.device}</span></p>
+                            <p><span class="label">Expected</span> <span>${dateDisplay}</span></p>
+                            <p><span class="label">Batch ID</span> <span>${ship.batch_id}</span></p>
+                            <div class="desc-box">
+                                ${ship.shipment_description}
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: #ccc;">No shipments found.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('shipment-grid').innerHTML = '<p style="text-align:center; color: #ff6b6b; grid-column: 1/-1;">Error loading data from server.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

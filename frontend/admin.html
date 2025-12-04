@@ -1,0 +1,312 @@
+<!-- frontend/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCMXpertLite - User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- THEME STYLING (Matches your image) --- */
+        body {
+            background-color: #1e1e2f; /* Deep Dark Purple Background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding-top: 80px; /* Space for navbar */
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: #27293d; /* Lighter dark purple */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8c9eff; /* Light purple accent */
+        }
+
+        .navbar a {
+            color: #e0e0e0;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffffff;
+        }
+
+        /* Container for the Table */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #8c9eff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        /* Table Styling */
+        .table-wrapper {
+            background-color: #27293d; /* Card Background */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: #3b3b6d; /* Header Purple */
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        th {
+            padding: 18px 20px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #363653; /* Divider lines */
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #2e2e42; /* Hover Row Effect */
+        }
+
+        /* Specific Text Colors */
+        .col-username {
+            color: #8c9eff; /* Blue/Purple for username */
+            font-weight: 600;
+        }
+
+        /* Role Badge Styling */
+        .role-badge {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Dropdown for Role Edit */
+        .role-select {
+            background-color: #1e1e2f;
+            color: white;
+            border: 1px solid #5e5ce6;
+            padding: 5px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-right: 5px;
+        }
+
+        .btn-edit { background-color: #5e5ce6; color: white; }
+        .btn-edit:hover { background-color: #4a48b8; }
+
+        .btn-save { background-color: #4caf50; color: white; }
+        .btn-save:hover { background-color: #388e3c; }
+
+        .btn-cancel { background-color: #e53935; color: white; }
+        .btn-cancel:hover { background-color: #c62828; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">SCMXpertLite Admin</div>
+        <div>
+            <a href="dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>User Management</h1>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Action</th> <!-- Added Action Column -->
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <!-- Rows will be inserted here by JavaScript -->
+                     <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Store users globally so we can access them for editing
+        let globalUsers = [];
+
+        // 1. Fetch Users from your Backend
+        async function fetchUsers() {
+            try {
+                // Using your existing API endpoint
+                const response = await fetch(`${window.location.origin}/user/all`, { credentials: 'include' });
+                
+                if (response.status === 401 || response.status === 403) {
+                    alert("Unauthorized. Admins only.");
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                globalUsers = await response.json();
+                renderTable(globalUsers);
+                
+            } catch (err) {
+                console.error("Error fetching users:", err);
+                document.getElementById('user-table-body').innerHTML = 
+                    `<tr><td colspan="5" style="text-align:center; color:#ff7b7b;">Error loading data. Is the backend running?</td></tr>`;
+            }
+        }
+
+        // 2. Render the Table
+        function renderTable(users) {
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = ""; // Clear current rows
+
+            users.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                
+                // We create unique IDs for elements based on the Index (or user ID)
+                tr.innerHTML = `
+                    <td>${user.id || user._id}</td>
+                    <td class="col-username">${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <!-- View Mode: Text -->
+                        <span id="role-text-${index}" class="role-badge">${user.role}</span>
+                        
+                        <!-- Edit Mode: Dropdown (Hidden initially) -->
+                        <select id="role-select-${index}" class="role-select hidden">
+                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>user</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+                        </select>
+                    </td>
+                    <td>
+                        <!-- Action Buttons -->
+                        <button id="edit-btn-${index}" class="btn btn-edit" onclick="enableEdit(${index})">Edit</button>
+                        
+                        <div id="action-btns-${index}" class="hidden">
+                            <button class="btn btn-save" onclick="saveRole(${index}, '${user.id || user._id}')">Save</button>
+                            <button class="btn btn-cancel" onclick="cancelEdit(${index})">Cancel</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 3. Enable Edit Mode
+        function enableEdit(index) {
+            document.getElementById(`role-text-${index}`).classList.add('hidden');
+            document.getElementById(`role-select-${index}`).classList.remove('hidden');
+            
+            document.getElementById(`edit-btn-${index}`).classList.add('hidden');
+            document.getElementById(`action-btns-${index}`).classList.remove('hidden');
+        }
+
+        // 4. Cancel Edit
+        function cancelEdit(index) {
+            document.getElementById(`role-text-${index}`).classList.remove('hidden');
+            document.getElementById(`role-select-${index}`).classList.add('hidden');
+            
+            document.getElementById(`edit-btn-${index}`).classList.remove('hidden');
+            document.getElementById(`action-btns-${index}`).classList.add('hidden');
+            
+            // Reset dropdown to original value
+            const select = document.getElementById(`role-select-${index}`);
+            select.value = globalUsers[index].role;
+        }
+
+        // 5. Save New Role (Send to Backend)
+        async function saveRole(index, userId) {
+            const newRole = document.getElementById(`role-select-${index}`).value;
+            
+            try {
+                // TODO: Replace this URL with your actual backend update endpoint
+                // Example: 'http://127.0.0.1:8000/user/update-role'
+                // For now, we simulate a success to update the UI
+                
+                const response = await fetch(`${window.location.origin}/user/${userId}/role`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ role: newRole })
+                });
+                if (!response.ok) throw new Error("Failed to update");
+
+                globalUsers[index].role = newRole; 
+
+                // Refresh the table row to view mode
+                document.getElementById(`role-text-${index}`).innerText = newRole;
+                cancelEdit(index); // Revert UI to view mode
+                alert(`Role updated to ${newRole} successfully!`);
+
+            } catch (error) {
+                console.error(error);
+                alert("Failed to update role.");
+            }
+        }
+
+        // Run on load
+        fetchUsers();
+    </script>
+</body>
+</html>

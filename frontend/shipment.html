@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCMXpertLite - Create Shipment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLING --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        
+        body { 
+            min-height: 100vh; 
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('pics/ship.jpg'); 
+            background-color: #111; 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: #fff; 
+        }
+
+        .navbar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 50px; 
+            height: 80px; 
+            width: 100%; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 1000; 
+            background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: blur(10px); 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+
+        .logo { font-size: 24px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 30px; height: 100%; }
+        .nav-links li a { text-decoration: none; color: #ccc; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .nav-links li a:hover, .nav-links li a.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        .main-container { display: flex; justify-content: center; align-items: center; padding-top: 120px; padding-bottom: 50px; min-height: 100vh; }
+        
+        .glass-form { 
+            background: rgba(30, 30, 30, 0.6); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            width: 100%; 
+            max-width: 900px; 
+            padding: 50px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: zoomIn 0.5s ease;
+        }
+
+        .form-header { text-align: center; margin-bottom: 40px; }
+        .form-header h2 { font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
+        .form-header p { color: #aaa; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px 40px; }
+        
+        /* Full width for Description */
+        .full-width { grid-column: span 2; }
+
+        .input-group { display: flex; flex-direction: column; position: relative; }
+        .input-group label { font-size: 13px; margin-bottom: 8px; color: #8f94fb; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .input-group input, .input-group select, .input-group textarea { 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); 
+            width: 100%; 
+            color: #fff;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #8f94fb;
+            background: rgba(0,0,0,0.5);
+            box-shadow: 0 0 10px rgba(143, 148, 251, 0.2);
+        }
+
+        .form-actions { display: flex; justify-content: center; gap: 30px; margin-top: 50px; }
+        
+        button { 
+            padding: 15px 45px; 
+            border-radius: 50px; 
+            border: none; 
+            font-weight: 700; 
+            cursor: pointer; 
+            color: white; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-create { background: linear-gradient(45deg, #4e54c8, #8f94fb); }
+        .btn-create:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(78, 84, 200, 0.5); }
+
+        .btn-clear { background: transparent; border: 1px solid #ff5454; color: #ff5454; }
+        .btn-clear:hover { background: #ff5454; color: white; }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } .navbar { height: auto; flex-direction: column; padding: 15px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">SCMXpertLite</div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-user"></i> My Account</a></li>
+            <li><a href="my_shipments.html"><i class="fa-solid fa-box-open"></i> My Shipment</a></li>
+            <li><a href="shipment.html" class="active"><i class="fa-solid fa-circle-plus"></i> New Shipment</a></li>
+            <li><a href="device_data.html"><i class="fa-solid fa-chart-line"></i> Device Data</a></li>
+            <li><a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <div class="glass-form">
+            <div class="form-header">
+                <h2>Create New Shipment</h2>
+                <p>Fill in the details to track your cargo efficiently</p>
+            </div>
+
+            <form id="shipment-form">
+                <div class="form-grid">
+                    <!-- 1. Shipment No -->
+                    <div class="input-group">
+                        <label>Shipment Number*</label>
+                        <input type="text" id="shipment_number" placeholder="Ex: SHP-2023001" required>
+                    </div>
+                    
+                    <!-- 2. Container No -->
+                    <div class="input-group">
+                        <label>Container Number*</label>
+                        <input type="text" id="container_number" placeholder="Ex: CONT-9988" required>
+                    </div>
+
+                    <!-- 3. Route -->
+                    <div class="input-group">
+                        <label>Route Details*</label>
+                        <select id="route_details" required>
+                            <option value="" disabled selected>Select Route</option>
+                            <option value="New York - London">New York - London</option>
+                            <option value="Arizona - Singapore">Arizona - Singapore</option>
+                            <option value="Mumbai - Dubai">Mumbai - Dubai</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. Goods -->
+                    <div class="input-group">
+                        <label>Goods Type*</label>
+                        <select id="goods_type" required>
+                            <option value="" disabled selected>Select Goods</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Petroleum">Petroleum</option>
+                            <option value="Medicine">Medicine</option>
+                        </select>
+                    </div>
+
+                    <!-- 5. Device -->
+                    <div class="input-group">
+                        <label>Device*</label>
+                        <select id="device" required>
+                            <option value="" disabled selected>Select Device</option>
+                        </select>
+                    </div>
+
+                    <!-- 6. Date (NEW) -->
+                    <div class="input-group">
+                        <label>Expected Delivery Date*</label>
+                        <input type="datetime-local" id="expected_delivery_date" required>
+                    </div>
+
+                    <!-- 7. PO Number (NEW) -->
+                    <div class="input-group">
+                        <label>PO Number*</label>
+                        <input type="text" id="po_number" placeholder="Ex: PO-555123" required>
+                    </div>
+
+                    <!-- 8. Delivery Number (NEW) -->
+                    <div class="input-group">
+                        <label>Delivery Number*</label>
+                        <input type="text" id="delivery_number" placeholder="Ex: DEL-777" required>
+                    </div>
+
+                    <!-- 9. NDC Number (NEW) -->
+                    <div class="input-group">
+                        <label>NDC Number*</label>
+                        <input type="text" id="ndc_number" placeholder="Ex: NDC-1002" required>
+                    </div>
+
+                    <!-- 10. Batch ID (NEW) -->
+                    <div class="input-group">
+                        <label>Batch ID*</label>
+                        <input type="text" id="batch_id" placeholder="Ex: BAT-2023-X" required>
+                    </div>
+
+                    <!-- 11. Serial Number (NEW) -->
+                    <div class="input-group full-width">
+                        <label>Serial Number of Goods*</label>
+                        <input type="text" id="serial_number_of_goods" placeholder="Ex: SN-001, SN-002" required>
+                    </div>
+
+                    <!-- 12. Description (NEW) -->
+                    <div class="input-group full-width">
+                        <label>Shipment Description</label>
+                        <textarea id="shipment_description" rows="3" placeholder="Enter additional details..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-clear" onclick="document.getElementById('shipment-form').reset()">Clear</button>
+                    <button type="submit" class="btn-create">Create Shipment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Populate device select from live device ids
+        document.addEventListener('DOMContentLoaded', async () => {
+            const deviceSel = document.getElementById('device');
+            try {
+                const res = await fetch(`${window.location.origin}/stream/device-ids-only`, { credentials: 'include' });
+                const ids = res.ok ? await res.json() : [];
+                ids.forEach(id => {
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = id;
+                    deviceSel.appendChild(opt);
+                });
+                const createBtn = document.querySelector('.btn-create');
+                if (ids.length === 0 && createBtn) {
+                    createBtn.disabled = true;
+                    createBtn.textContent = 'No devices available';
+                }
+            } catch (e) { /* ignore populate errors */ }
+        });
+
+        document.getElementById('shipment-form').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent page reload
+
+            // 1. Collect Data from all fields
+            const data = {
+                shipment_number: document.getElementById('shipment_number').value,
+                container_number: document.getElementById('container_number').value,
+                route_details: document.getElementById('route_details').value,
+                goods_type: document.getElementById('goods_type').value,
+                device: document.getElementById('device').value,
+                expected_delivery_date: document.getElementById('expected_delivery_date').value,
+                po_number: document.getElementById('po_number').value,
+                delivery_number: document.getElementById('delivery_number').value,
+                ndc_number: document.getElementById('ndc_number').value,
+                batch_id: document.getElementById('batch_id').value,
+                serial_number_of_goods: document.getElementById('serial_number_of_goods').value,
+                shipment_description: document.getElementById('shipment_description').value,
+                
+                // Usually handled by backend based on Token, but sending if required:
+                created_by: "user_session", 
+                created_at: new Date().toISOString()
+            };
+
+            // 2. Get Token for Authentication
+            const token = localStorage.getItem('access_token');
+
+            try {
+                // 3. Send Request to Backend
+                const response = await fetch(`${window.location.origin}/shipment/create-shipment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert("Shipment Created Successfully!");
+                    window.location.href = "my_shipments.html"; // Redirect on success
+                } else {
+                    const error = await response.json();
+                    alert("Error: " + (error.detail || "Failed to create shipment"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Something went wrong. Is the backend running?");
+            }
+        });
+
+        // Logout Logic
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            localStorage.removeItem('access_token');
+            await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+            window.location.href = 'trail.html';
+        });
+    </script>
+
+</body>
+</html>

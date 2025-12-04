@@ -1,0 +1,17 @@
+uvicorn 
+fastapi
+passlib[CryptContext]
+bcrypt==3.2.2
+pyJWT
+pymongo
+dotenv
+pydantic
+pydantic[email]
+kafka-python
+jinja2
+requests
+python-jose
+google-auth
+python-multipart
+email-validator
+fastapi-mail
